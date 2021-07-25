@@ -18,9 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class RestaurantSerializer(serializers.ModelSerializer):
-
+class RestaurantSerializerWithAvg(serializers.ModelSerializer):
     avg = serializers.FloatField()
+
+    class Meta:
+        model = Restaurant
+        fields = "__all__"
+
+class RestaurantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Restaurant
@@ -33,7 +38,6 @@ class UserRestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserRestaurantRating
         fields = "__all__"
-
 
 class TokenSerializr(serializers.ModelSerializer):
     user = UserSerializer()
