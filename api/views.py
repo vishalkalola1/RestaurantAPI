@@ -127,9 +127,9 @@ def restaurants(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def restaurants_details(request, id):
-
-    restaurant = Restaurant.objects.filter(id=id)
-    if not restaurant:
+    try:
+        restaurant = Restaurant.objects.get(id=id)
+    except Restaurant.DoesNotExist:
         return Response({"detail":"Restaurant does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
