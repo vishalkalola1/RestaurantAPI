@@ -17,8 +17,8 @@ urlpatterns = [
     path("register", create_user_view, name="register"),
     path("login", login_view, name="login"),
     path("restaurants", get_restaurant_list, name="user-restaurants"),
-    path("restaurants/<int:id>/comments", get_restaurant_comments, name="restaurnat-comments"),
-    path("comment", create_user_restaurant_rating, name="create-comment"),
+    path("restaurants/<int:id>/reviews", get_restaurant_comments, name="restaurnat-comments"),
+    # path("reviews", create_user_restaurant_rating, name="create-comment"),
 
     #admin Urls
     path("restaurants/create", restaurants, name="admin-restaurants"),

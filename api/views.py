@@ -141,9 +141,9 @@ def restaurants_details(request, id):
             return Response({"detail": "Please check your inputs"}, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == "DELETE":
         restaurant.delete()
-        return Response({"detail": "Record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail":"Restaurant deleted Successfully"}, status=status.HTTP_200_OK)
     else:
-        serializer = RestaurantSerializer(restaurant[0])
+        serializer = RestaurantSerializer(restaurant)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -162,9 +162,9 @@ def users(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def users_details(request, id):
-
-    user = User.objects.filter(id=id)
-    if not user:
+    try:
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
         return Response({"detail":"User does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
@@ -174,14 +174,22 @@ def users_details(request, id):
             user.last_name = request.data["last_name"]
         if request.data["email"]:
             user.email = request.data["email"]
+
+        if request.data["is_superuser"] != None:
+            print(request.data["is_superuser"])
+            user.is_superuser = request.data["is_superuser"]
+        if request.data["is_staff"] != None:
+            print(request.data["is_staff"])
+            user.is_staff = request.data["is_staff"]
+        
         user.save()
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == "DELETE":
         user.delete()
-        return Response({"detail": "Record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail":"User deleted Successfully"}, status=status.HTTP_200_OK)
     else:
-        serializer = UserSerializer(user[0])
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -205,8 +213,9 @@ def user_ratings(request):
 @authentication_classes([TokenAuthentication])
 def user_ratings_details(request, id):
 
-    userrestaurantrating = UserRestaurantRating.objects.filter(id=id)
-    if not userrestaurantrating:
+    try:
+        userrestaurantrating = UserRestaurantRating.objects.get(id=id)
+    except UserRestaurantRating.DoesNotExist:
         return Response({"detail":"Review does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'PUT':
@@ -221,7 +230,7 @@ def user_ratings_details(request, id):
         return Response(serializers.data, status=status.HTTP_200_OK)
     elif request.method == "DELETE":
         userrestaurantrating.delete()
-        return Response({"detail": "Record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail":"Record deleted Successfully"}, status=status.HTTP_200_OK)
     else:
-        serializers = UserRestaurantSerializer(userrestaurantrating[0])
+        serializers = UserRestaurantSerializer(userrestaurantrating)
         return Response(serializers.data, status=status.HTTP_200_OK) 
