@@ -57,15 +57,19 @@ def login_view(request):
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_restaurant_list(request):
-    qs = Restaurant.objects.all().annotate(avg=Coalesce(Avg("user_rating__rating"), 0.0)).order_by("-avg")
-    serializer = RestaurantSerializerWithAvg(qs, many=True)
+    if not request.user.is_superuser:
+        qs = Restaurant.objects.all().annotate(avg=Coalesce(Avg("user_rating__rating"), 0.0)).order_by("-avg")
+        serializer = RestaurantSerializerWithAvg(qs, many=True)
+    else:
+        qs = Restaurant.objects.all()
+        serializer = RestaurantSerializer(qs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
-def get_restaurant_detail(request, id):
+def get_restaurant_comments(request, id):
     qs = UserRestaurantRating.objects.filter(restaurant=id)
     serializer = UserRestaurantSerializer(qs, many=True)
     return Response(serializer.data)
@@ -102,27 +106,20 @@ def create_review(data):
 
 ###### Admin Operations #######
 
-@api_view(["GET","POST"])
+@api_view(["POST"])
 @permission_classes([IsAdminUser])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def restaurants(request):
-    if request.method == "GET":
-        qs = Restaurant.objects.all()
-        serializer = RestaurantSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        user_data = request.data
-        if user_data:
-            serializer = RestaurantSerializer(data=user_data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"detail": "please check your inputs"}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"detail": "Not Found"}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({"detail": "Method not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+    user_data = request.data
+    if user_data:
+        serializer = RestaurantSerializer(data=user_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"detail": "please check your inputs"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"detail": "Not Found"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET","DELETE","PUT"])
@@ -150,19 +147,14 @@ def restaurants_details(request, id):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(["GET","POST"])
+@api_view(["GET"])
 @permission_classes([IsAdminUser])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def users(request):
-    if request.method == "GET":
-        qs = User.objects.all().exclude(id=request.user.id)
-        serializer = UserSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    elif request.method == 'POST':
-        return create_user(request.data)
-    else:
-        return Response({"detail": "Method not allowed"}, status=status.HTTP_400_BAD_REQUEST)
+    qs = User.objects.all().exclude(id=request.user.id)
+    serializer = UserSerializer(qs, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET","DELETE","PUT"])
