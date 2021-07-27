@@ -194,7 +194,7 @@ def users_details(request, id):
 
 
 @api_view(["GET","POST"])
-@permission_classes([IsAdminUser])
+@permission_classes([AllowAny])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def user_ratings(request):
