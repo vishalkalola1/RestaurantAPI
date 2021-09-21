@@ -47,10 +47,14 @@ def login_view(request):
     user_data = request.data
     user_qs = authenticate(username=user_data["username"], password=user_data["password"])
     if user_qs:
-        token = Token.objects.get(user=user_qs)
-        serializer = TokenSerializr(token)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response({"detail": "Authentication Error"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            token = Token.objects.get(user=user_qs)
+            print("test")
+            serializer = TokenSerializr(token)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"detail": "Error Authentication"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"detail": "Unknown user"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(["GET"])
