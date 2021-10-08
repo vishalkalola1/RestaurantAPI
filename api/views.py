@@ -2,7 +2,7 @@ import re
 from .models import Restaurant, UserRestaurantRating
 from .serializers import UserSerializer, RestaurantSerializer, UserRestaurantSerializer, TokenSerializr, RestaurantSerializerWithAvg
 from rest_framework import serializers, status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +12,7 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.auth import authenticate
 from django.db.models import Avg
 from django.db.models.functions import Coalesce
-
+from rest_framework.parsers import MultiPartParser, FormParser
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -114,6 +114,7 @@ def create_review(data):
 @permission_classes([IsAdminUser])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
+@parser_classes([MultiPartParser, FormParser])
 def restaurants(request):
     user_data = request.data
     if user_data:

@@ -4,7 +4,6 @@ from .views import (
     login_view,
     get_restaurant_list,
     get_restaurant_comments,
-    create_user_restaurant_rating,
     restaurants,
     restaurants_details,
     users,
@@ -12,6 +11,9 @@ from .views import (
     user_ratings,
     user_ratings_details
 )
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("register", create_user_view, name="register"),
@@ -28,3 +30,5 @@ urlpatterns = [
     path("reviews", user_ratings, name="users_reviews"),
     path("reviews/<int:id>", user_ratings_details, name="users_reviews_details"),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

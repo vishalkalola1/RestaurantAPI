@@ -14,3 +14,4 @@ tomli==1.0.4
 python-decouple
 psycopg2-binary
 dj-database-url
+pillow
