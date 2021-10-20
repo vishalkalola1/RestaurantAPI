@@ -157,7 +157,7 @@ def restaurants_details(request, id):
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def users(request):
-    qs = User.objects.all().exclude(id=request.user.id)
+    qs = User.objects.all().exclude(id=request.user.id).order_by("-id")
     serializer = UserSerializer(qs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
